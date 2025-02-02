@@ -2,15 +2,19 @@ import hashlib
 import uuid
 from app.schemas.payment_schema import TokenizationRequest
 import logging
+from datetime import datetime
+
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+
 def generate_card_token(payment_details: TokenizationRequest) -> str:
     try:
         # Log the received card number (masking most of it for security)
-        logger.debug(f"Generating token for card number ending in {payment_details.cardNumber[-4:]}")
+        masked_card_number = f"**** **** **** {payment_details.cardNumber[-4:]}"
+        logger.debug(f"Generating token for card number ending in {masked_card_number}")
 
         # Step 1: Generate a unique identifier
         unique_id = uuid.uuid4().hex
@@ -30,6 +34,23 @@ def generate_card_token(payment_details: TokenizationRequest) -> str:
 
         return token
     except Exception as e:
-        # Use logger.exception to log with full traceback, avoiding "unused" warning
         logger.exception("Failed to generate token")
         raise e  # Explicitly re-raise the exception
+
+def generate_unique_token(card_token: str) -> str:
+    """
+    Generates a unique token using the card token, a UUID, and the current timestamp.
+    
+    Args:
+        card_token (str): The hashed or truncated card number (or card token).
+        
+    Returns:
+        str: A unique token string.
+    """
+    # Use UUID for randomness, and current UTC timestamp for uniqueness
+    unique_data = f"{card_token}{uuid.uuid4()}{datetime.utcnow().isoformat()}"
+    
+    # Hash the combined data to create a unique token
+    unique_token = hashlib.sha256(unique_data.encode()).hexdigest()
+    
+    return unique_token

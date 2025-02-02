@@ -24,3 +24,5 @@ werkzeug
 apscheduler
 bcrypt
 password-validator
+watchdog 
+uvicorn

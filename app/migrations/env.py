@@ -21,7 +21,7 @@ fileConfig(config.config_file_name)
 #from app.models.order import OrderModel  # Ensure 'Base' is correctly imported from your models
 from app.database import BaseModel
 from app.models.transaction_model import TransactionModel
-
+from app.models.payment import PaymentDetailsModel
 
 
 target_metadata = BaseModel.metadata
